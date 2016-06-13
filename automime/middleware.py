@@ -11,25 +11,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import mimetypes
-import os
 
+from swift.common.http import is_success
 from swift.common.swob import Request
 from swift.common.utils import register_swift_info
+from swift.proxy.controllers.base import get_container_info
 
 mimetypes.init()
 
 
-class AutoEncodingMiddleware(object):
+class AutoMimeMiddleware(object):
 
     def __init__(self, app, conf, *args, **kwargs):
         self.app = app
 
     def __call__(self, env, start_response):
 
-        request = Request(env.copy())
+        request = Request(env)
         if request.method == "PUT":
-            _, ext = os.path.splitext(request.path)
-            encoding = mimetypes.encodings_map.get(ext)
+            # Ensure a possibly cached CONTENT_TYPE will be cleared
+            if env.get('CONTENT_TYPE'):
+                del env['CONTENT_TYPE']
+            container_info = get_container_info(
+                request.environ, self.app, swift_source='AM')
+            if not container_info or not is_success(container_info['status']):
+                return self.app(env, start_response)
+
+            meta = container_info.get('meta', {})
+            enabled = meta.get('automime')
+
+            if not enabled:
+                return self.app(env, start_response)
+
+            _type, encoding = mimetypes.guess_type(request.path)
+            if _type:
+                env['HTTP_CONTENT_TYPE'] = _type
             if encoding:
                 env['HTTP_CONTENT_ENCODING'] = encoding
 
@@ -40,8 +56,8 @@ def filter_factory(global_conf, **local_conf):
     """Returns a WSGI filter app for use with paste.deploy."""
     conf = global_conf.copy()
     conf.update(local_conf)
-    register_swift_info('AutoEncoding')
+    register_swift_info('automime')
 
     def auth_filter(app):
-        return AutoEncodingMiddleware(app, conf)
+        return AutoMimeMiddleware(app, conf)
     return auth_filter

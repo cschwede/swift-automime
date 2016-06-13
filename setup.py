@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 __author__ = "Christian Schwede <cschwede@redhat.com>"
-name = 'autoencoding'
+name = 'automime'
 entry_point = '%s.middleware:filter_factory' % (name)
 version = '0.1'
 
