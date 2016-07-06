@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 __author__ = "Christian Schwede <cschwede@redhat.com>"
-name = 'automime'
-entry_point = '%s.middleware:filter_factory' % (name)
+name = 'swift-automime'
+entry_point = 'automime.middleware:filter_factory'
 version = '0.1'
 
 from setuptools import setup, find_packages
@@ -13,7 +13,7 @@ setup(
     license='Apache License (2.0)',
     author='Christian Schwede',
     author_email='cschwede@redhat.com',
-    url='https://github.com/cschwede/swift-%s' % (name),
+    url='https://github.com/cschwede/swift-automime',
     packages=find_packages(),
     test_suite='nose.collector',
     classifiers=[
