@@ -24,6 +24,6 @@ setup(
         'Environment :: No Input/Output (Daemon)'],
     install_requires=['swift'],
     entry_points={
-        'paste.filter_factory': ['%s=%s' % (name, entry_point)]
+        'paste.filter_factory': ['automime=%s' % entry_point]
     },
 )

@@ -17,7 +17,7 @@ Quick Install
 2) Add a filter entry for automime to your proxy-server.conf:
 
     [filter:automime]
-    use = egg:automime#automime
+    use = egg:swift_automime#automime
 
 3) Alter your proxy-server.conf pipeline and add automime after any
    authentication middleware:
